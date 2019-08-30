@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  web:
+    image: ${RESOLVED_WEB_IMAGE}
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ..:/var/www
+    command: supervisord -n
+    env_file: .env
+    environment:
+      LOCAL_USER_ID: 0
+      WWW_DATA_USER_ID: ${DOCKER_HOST_USER_ID}
+      GAE_SERVICE: 0
+      GOOGLE_CLOUD_PROJECT: 0
+      GAE_VERSION: 0
+    networks:
+      default:
+        aliases:
+          - stdcheck.local
+          - www.stdcheck.local
+          - www.crossdomain.local
+
+  db:
+    image: ${MYSQL_IMAGE}
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: stdlocal
+    volumes:
+      - ./db:/etc/mysql/conf.d
+
+  redis:
+    image: ${REDIS_IMAGE}
+    env_file: .env
+    command:
+      --requirepass password
+
+  s3:
+    image: ${S3_IMAGE}
+    environment:
+      MINIO_ACCESS_KEY: s3_key
+      MINIO_SECRET_KEY: s3_secret
+    entrypoint: sh
+    volumes:
+       - ..:/var/www
+    command: -c 'cd /data && rm -rf * && mkdir stdcheck-partial-storage stdcheck-final-storage stdcheck-notes-storage stdcheck-message-storage stdcheck-requisitions-storage stdcheck-invoices-storage stdcheck-cover-page stdcheck-temp-labs-csv stdcheck-temp-pdf stdcheck-logs stdcheck-orphan-result stdcheck-affiliate-sales && cp /var/www/storage/covers/* stdcheck-cover-page && /usr/bin/minio server /data'
+
+networks:
+  default:
+    driver: bridge

@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  web:
+    ports:
+      - 80:80
+    extra_hosts:
+      - "phpstorm:${PHPSTORM_HOST_IP}"
+    environment:
+      # Exposes the host BLACKFIRE_SERVER_ID and TOKEN environment variables.
+      - BLACKFIRE_SERVER_ID=${BLACKFIRE_SERVER_ID}
+      - BLACKFIRE_SERVER_TOKEN=${BLACKFIRE_SERVER_TOKEN}
+      - BLACKFIRE_LOG_LEVEL=4
+      - PHP_ALL_DEFAULT_SOCKET_TIMEOUT=30
+
+  blackfire:
+    image: blackfire/blackfire
+    environment:
+      - BLACKFIRE_SERVER_ID=${BLACKFIRE_SERVER_ID}
+      - BLACKFIRE_SERVER_TOKEN=${BLACKFIRE_SERVER_TOKEN}
+      - BLACKFIRE_LOG_LEVEL=4
+
+  db:
+    ports:
+      - 3306:3306
+
+  s3:
+    ports:
+      - 9003:9000
+
+  phpmyadmin:
+    build: phpmyadmin
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    env_file: .env
+    ports:
+      - 8080:80

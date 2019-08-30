@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  chrome:
+    image: ${SELENIUM_IMAGE}
+    healthcheck:
+      test: ["CMD", "wget", "localhost:4444", "-O", "/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - web
+      - proxy
+    environment:
+      SCREEN_WIDTH: ${WEBDRIVER_WIDTH}
+      SCREEN_HEIGHT: ${WEBDRIVER_HEIGHT}
+      http_proxy: http://proxy:3128
+      https_proxy: http://proxy:3128
+      no_proxy: www.stdcheck.local,stdcheck.local,localhost,www.crossdomain.local
+    ports:
+      - 5900:5900
+    volumes:
+      - /dev/shm:/dev/shm
+      - ..:/var/www
+    env_file: .env
+
+  db:
+    tmpfs: /var/lib/mysql
+
+  proxy:
+    image: ${SQUID_OWNER}/${SQUID_REPO}:${SQUID_TAG}
