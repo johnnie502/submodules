@@ -1,0 +1,9 @@
+preset: symfony
+
+disabled:
+  - unalign_double_arrow
+  - unalign_equals
+  - yoda_style
+  - single_line_throw
+  - concat_without_spaces
+  - no_unneeded_curly_braces
