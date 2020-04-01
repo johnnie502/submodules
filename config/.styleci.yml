@@ -7,4 +7,3 @@ disabled:
   - single_line_throw
   - concat_without_spaces
   - no_unneeded_curly_braces
-  - single_line_throw
