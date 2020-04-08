@@ -7,7 +7,8 @@ set -eu
 
 docker run \
     -e LOCAL_USER_ID=$DOCKER_HOST_USER_ID \
-    -i${TTY} \
+    -i \
     --rm \
+    $TTY \
     -v $(pwd):/workdir:delegated \
     gcr.io/docker-1000101/php-cs-fixer:2.16.1-e789817 "$@"
