@@ -6,7 +6,7 @@ set -eu
 . get_user
 
 docker run \
-    $LOCAL_USER_ID \
+    ${LOCAL_USER_ID:''} \
     -i \
     --rm \
     $TTY \
