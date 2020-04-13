@@ -2,10 +2,10 @@
 
 set -eu
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-. ${DIR}/get_tty
-. ${DIR}/get_user
+. ${dir}/get_tty
+. ${dir}/get_user
 
 docker run \
     ${LOCAL_USER_ID:''} \
