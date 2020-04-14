@@ -1,5 +1,4 @@
 version: 3
-extends: "https://api.github.com/repos/medology/Scripts/contents/Pull%20Approve/base.pullapprove.yml?ref=master"
 pullapprove_conditions:
   - condition: "base.ref == 'master'"
     unmet_status: failure
@@ -19,3 +18,12 @@ pullapprove_conditions:
   - condition: "state == 'open'"
     unmet_status: failure
     explanation: "PR must be open to be reviewed"
+groups:
+  DevOpsGroup:
+    reviews:
+      required: 2
+      request: 2
+      request_order: shuffle
+    reviewers:
+      teams:
+        - DevOps
