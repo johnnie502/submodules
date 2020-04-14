@@ -20,17 +20,6 @@ pullapprove_conditions:
     explanation: "PR must be open to be reviewed"
 groups:
   DevOpsGroup:
-    conditions:
-      - "'dependencies' not in labels"
-      - >
-        '.circleci/*' in files or
-        'bin/*' in files or
-        'docker/*' in files or
-        'google/*' in files or
-        'sandbox/*' in files or
-        '.dock*' in files or
-        '.env*' in files or
-        '.git*' in files
     reviews:
       required: 2
       request: 2
