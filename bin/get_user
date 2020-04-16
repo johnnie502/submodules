@@ -3,6 +3,7 @@
 set -eu
 
 # Set the LOCAL_USER_ID env var arg if we're on Linux.
+LOCAL_USER_ID=''
 if [ `uname` == 'Linux' ]; then
   export LOCAL_USER_ID="-e LOCAL_USER_ID=`id -u`"
 fi
