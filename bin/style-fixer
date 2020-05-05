@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+set -eu
+
+# Stop when there is no file to fix
+if [[ -z $@ ]]; then
+  echo "No files to fix."
+  exit 0
+fi
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+. "$ROOT"/bin/lib/colors.sh
+
+# Checks if element exists in array
+contains() {
+  local e match="$1"
+  shift
+  for e; do [[ "$e" == "$match" ]] && return 0; done
+  return 1
+}
+
+FRONTEND_EXT=('css' 'scss' 'html' 'js')
+PHP_EXT=('php')
+GHERKIN_EXT=('feature')
+FRONTEND_FILES=""
+PHP_FILES=""
+GHERKIN_FILES=""
+
+# Split files into array
+IFS=' ' read -r -a FILES <<<"$@"
+
+# Iterate array to check every file and extension
+for filename in "${FILES[@]}"; do
+  if contains "${filename#*.}" "${FRONTEND_EXT[@]}"; then
+    FRONTEND_FILES="${FRONTEND_FILES} ${filename}"
+  elif contains "${filename#*.}" "${PHP_EXT[@]}"; then
+    PHP_FILES="${PHP_FILES} ${filename}"
+  elif contains "${filename##*.}" "${GHERKIN_EXT[@]}"; then
+    GHERKIN_FILES="${GHERKIN_FILES} ${filename}"
+  fi
+done
+
+# Frontend files
+if [[ $FRONTEND_FILES != "" ]]; then
+  echo -e "${GREEN}Fixing Frontend files code style...${NC}"
+  echo $FRONTEND_FILES | xargs "$ROOT"/bin/prettier-eslint --write --single-quote --print-width 120
+fi
+
+# Gherkin files
+if [[ $GHERKIN_FILES != "" ]]; then
+  echo -e "${GREEN}Fixing Gherkin files code style...${NC}"
+  echo $GHERKIN_FILES | xargs "$ROOT"/bin/gherkin-cs-fixer
+fi
+
+# PHP files
+if [[ $PHP_FILES != "" ]]; then
+  echo -e "${GREEN}Fixing PHP files code style...${NC}"
+  echo $PHP_FILES | xargs "$ROOT"/bin/php-cs-fixer fix --config=.php_cs.dist --allow-risky=yes
+  echo -e "${GREEN}php-cs-fixer -> Success${NC}"
+fi
+
+echo -e "${GREEN}Success!!!${NC}"

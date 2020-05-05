@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+set -eu
+
+root=$(dirname "$0")
+
+files="$(git diff --diff-filter=CMTR --name-only origin/master...HEAD)"
+
+./style-fixer ${files}
+
+# Adding files to git again, in case of formatting changes
+echo ${files} | xargs git add
+
+git status
+
+if [[ $(git status | grep -Ec 'Changes to be committed') -eq 0 ]]; then
+  echo "No style issues found moving on..."
+  exit 0
+fi
+
+api_response=$(
+curl -H "Authorization: token $GITHUB_OAUTH" -H "Accept: application/vnd.github.shadow-cat-preview+json" \
+     -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${CIRCLE_PR_NUMBER}
+    )
+
+git_url=$(echo ${api_response} | jq '.head.repo.git_url' | sed -e 's/^"//' -e 's/"$//')
+
+git_ref=$(echo ${api_response} | jq '.head.ref' | sed -e 's/^"//' -e 's/"$//')
+
+git remote add temp ${git_url}
+git fetch temp
+git checkout --track temp/${git_ref}
+echo "Found style issues. pushing back to branch..."
+git commit -m"fix style"
+git push
+exit 1
