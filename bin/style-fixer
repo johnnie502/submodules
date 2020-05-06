@@ -1,16 +1,13 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -eu
 
-set -eu
-
-# Stop when there is no file to fix
 if [[ -z $@ ]]; then
-  echo "No files to fix."
-  exit 0
+  echo "No files provided"
+  exit 1
 fi
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-. "$ROOT"/bin/lib/colors.sh
+. "$dir"/get_colors
 
 # Checks if element exists in array
 contains() {
@@ -20,44 +17,45 @@ contains() {
   return 1
 }
 
-FRONTEND_EXT=('css' 'scss' 'html' 'js')
-PHP_EXT=('php')
-GHERKIN_EXT=('feature')
-FRONTEND_FILES=""
-PHP_FILES=""
-GHERKIN_FILES=""
+front_end_ext=('css' 'scss' 'html' 'js')
+php_ext=('php')
+gherkin_ext=('feature')
+front_end_files=""
+php_files=""
+gherkin_files=""
 
 # Split files into array
-IFS=' ' read -r -a FILES <<<"$@"
+ifs=' ' read -r -a files <<<"$@"
 
 # Iterate array to check every file and extension
-for filename in "${FILES[@]}"; do
-  if contains "${filename#*.}" "${FRONTEND_EXT[@]}"; then
-    FRONTEND_FILES="${FRONTEND_FILES} ${filename}"
-  elif contains "${filename#*.}" "${PHP_EXT[@]}"; then
-    PHP_FILES="${PHP_FILES} ${filename}"
-  elif contains "${filename##*.}" "${GHERKIN_EXT[@]}"; then
-    GHERKIN_FILES="${GHERKIN_FILES} ${filename}"
+for filename in "${files[@]}"; do
+  if contains "${filename#*.}" "${front_end_ext[@]}"; then
+    front_end_files="${front_end_files} ${filename}"
+  elif contains "${filename#*.}" "${php_ext[@]}"; then
+    php_files="${php_files} ./${filename}"
+  elif contains "${filename##*.}" "${gherkin_ext[@]}"; then
+    gherkin_files="${gherkin_files} ${filename}"
   fi
 done
 
 # Frontend files
-if [[ $FRONTEND_FILES != "" ]]; then
+if [[ "$front_end_files" != "" ]]; then
   echo -e "${GREEN}Fixing Frontend files code style...${NC}"
-  echo $FRONTEND_FILES | xargs "$ROOT"/bin/prettier-eslint --write --single-quote --print-width 120
+  "$dir"/prettier-eslint ${front_end_files##*( )} --write --single-quote --print-width=120
 fi
 
 # Gherkin files
-if [[ $GHERKIN_FILES != "" ]]; then
+if [[ "$gherkin_files" != "" ]]; then
   echo -e "${GREEN}Fixing Gherkin files code style...${NC}"
-  echo $GHERKIN_FILES | xargs "$ROOT"/bin/gherkin-cs-fixer
+  echo ${gherkin_files}
+  "$dir"/gherkin-cs-fixer ${gherkin_files##*( )}
 fi
 
 # PHP files
-if [[ $PHP_FILES != "" ]]; then
+if [[ "$php_files" != "" ]]; then
   echo -e "${GREEN}Fixing PHP files code style...${NC}"
-  echo $PHP_FILES | xargs "$ROOT"/bin/php-cs-fixer fix --config=.php_cs.dist --allow-risky=yes
-  echo -e "${GREEN}php-cs-fixer -> Success${NC}"
+  echo ${php_files}
+  "$dir"/php-cs-fixer ${php_files##*( )} --config=.php_cs.dist --allow-risky=yes
 fi
 
 echo -e "${GREEN}Success!!!${NC}"
