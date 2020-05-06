@@ -9,7 +9,13 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 . "$dir"/get_colors
 
-# Checks if element exists in array
+#######################################
+# Check if a string contains another string
+#
+# Arguments:
+#   1 the haystack to check within
+#   2 the needle to look for
+#######################################
 contains() {
   local e match="$1"
   shift
