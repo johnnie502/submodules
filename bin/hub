@@ -1,14 +1,12 @@
-#!/usr/bin/env bash
-
-set -eu
+#!/usr/bin/env bash -eu
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 . ${dir}/get_tty
-. ${dir}/get_user
+. ${dir}/get_local_user
 
 docker run \
-    ${LOCAL_USER_ID:''} \
+    ${LOCAL_USER_ID:-} \
     -i \
     --rm \
     ${TTY} \
