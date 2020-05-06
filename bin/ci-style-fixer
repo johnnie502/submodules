@@ -21,10 +21,12 @@ set_pull_request_branch () {
 
 #######################################
 # Clean and launch the repository with the provided qa flag if there is one.
-#
-# Arguments:
-#   1 the url of the pull requests branch
-#   2 the ref of the pull requests branch
+
+# Globals:
+#   GITHUB_OAUTH
+#   CIRCLE_PROJECT_USERNAME
+#   CIRCLE_PROJECT_REPONAME
+#   CIRCLE_PR_NUMBER
 #######################################
 get_pr_details () {
     echo curl -H "Authorization: token $GITHUB_OAUTH" -H "Accept: application/vnd.github.shadow-cat-preview+json" \
@@ -35,8 +37,7 @@ get_pr_details () {
 # Fix and stage files
 #
 # Arguments:
-#   1 the url of the pull requests branch
-#   2 the ref of the pull requests branch
+#   1 the files to fix / stage
 #######################################
 fix_and_stage_styles () {
     local files=$1
@@ -46,7 +47,8 @@ fix_and_stage_styles () {
 }
 
 #######################################
-# Checks if any files have been fixed exits if not
+# Checks if any files have been fixed
+# exits if not
 #######################################
 check_if_changes_present () {
     if [[ $(git status | grep -Ec 'Changes to be committed') -eq 0 ]]; then
