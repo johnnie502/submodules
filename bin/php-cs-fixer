@@ -9,5 +9,5 @@ docker run \
     ${LOCAL_USER_ID:-} \
     ${TTY} \
     -v $(pwd):/workdir:delegated \
-    gcr.io/docker-1000101/php-cs-fixer:2.16.1-e789817 \
+    ${PHP_CS_FIXER_IMAGE} \
     fix "$@"
