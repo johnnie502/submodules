@@ -1,4 +1,6 @@
-#!/usr/bin/env bash -eu
+#!/usr/bin/env bash
+
+set -eu
 
 export DOCKER_REGISTRY_HOST=registry.hub.docker.com
 export DOCKER_REGISTRY_ACCOUNT=medology
