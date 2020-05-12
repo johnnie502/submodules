@@ -22,8 +22,8 @@ set_pull_request_branch () {
 }
 
 #######################################
-# Clean and launch the repository with the provided qa flag if there is one.
-
+# Retrieve the details of the pull request from the github api
+#
 # Globals:
 #   GITHUB_OAUTH
 #   CIRCLE_PROJECT_USERNAME
@@ -52,7 +52,7 @@ fix_and_stage_styles () {
 # Checks if any files have been fixed
 # exits if not
 #######################################
-check_if_changes_present () {
+exit_if_no_changes () {
     if [[ $(git status | grep -Ec 'Changes to be committed') -eq 0 ]]; then
       echo "No style issues found moving on..."
       exit 0
@@ -71,7 +71,7 @@ apply_changes_and_exit () {
 
 fix_and_stage_styles ${files}
 
-check_if_changes_present
+exit_if_no_changes
 
 api_response=$(get_pr_details)
 
