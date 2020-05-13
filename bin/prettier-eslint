@@ -10,7 +10,7 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 docker run \
     ${LOCAL_USER_ID:-} \
-    ${TTY:-} \
+    ${TTY} \
     --rm \
     -i \
     -v $(pwd):/var/www:delegated \
