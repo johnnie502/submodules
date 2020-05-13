@@ -2,7 +2,6 @@
 
 set -eu
 
-TTY='-i';
 if [[ -t 0 ]] ; then
-  TTY="${TTY}t";
+  TTY="-t";
 fi

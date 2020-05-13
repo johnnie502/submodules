@@ -12,6 +12,7 @@ docker run \
     ${LOCAL_USER_ID:-} \
     ${TTY:-} \
     --rm \
+    -i \
     -v $(pwd):/var/www:delegated \
     -w /var/www \
     ${PRETTIER_ESLINT_IMAGE} "$@"

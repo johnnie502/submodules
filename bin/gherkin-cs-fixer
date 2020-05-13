@@ -11,6 +11,7 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 docker run \
     ${LOCAL_USER_ID:-} \
     ${TTY} \
+    -i \
     --rm \
     -v $(pwd):/workdir:delegated \
     ${GHERKIN_CS_FIXER_IMAGE} "$@"
