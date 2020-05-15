@@ -5,12 +5,12 @@ set -eu
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 . ${dir}/get_tty
-. ${dir}/get_user
+. ${dir}/get_local_user
 
 docker run \
     ${LOCAL_USER_ID:-} \
-    -i \
-    --rm \
     ${TTY} \
+    -i \
     -v $(pwd):/workdir:delegated \
-    gcr.io/docker-1000101/php-cs-fixer:2.16.1-e789817 "$@"
+    ${PHP_CS_FIXER_IMAGE} \
+    fix "$@"

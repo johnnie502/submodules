@@ -6,11 +6,12 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 . ${dir}/get_tty
 . ${dir}/get_local_user
+. ${dir}/get_images
 
 docker run \
     ${LOCAL_USER_ID:-} \
-    --rm \
     ${TTY} \
     -i \
+    --rm \
     -v $(pwd):/workdir:delegated \
-    gcr.io/docker-1000101/hub:2.14.2-a1ab6f08a699bc1c22b131536e4c05db65c53eff "$@"
+    ${GHERKIN_CS_FIXER_IMAGE} "$@"

@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+
+set -eu
+
+if [[ -z $@ ]]; then
+  echo "No files provided"
+  exit 1
+fi
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+. "$dir"/get_colors
+
+#######################################
+# Check if a string contains another string
+#
+# Arguments:
+#   1 the haystack to check within
+#   2 the needle to look for
+#######################################
+contains() {
+  local e match="$1"
+  shift
+  for e; do [[ "$e" == "$match" ]] && return 0; done
+  return 1
+}
+
+front_end_ext=('css' 'scss' 'html' 'js')
+php_ext=('php')
+gherkin_ext=('feature')
+front_end_files=""
+php_files=""
+gherkin_files=""
+
+# Split files into array
+ifs=' ' read -r -a files <<<"$@"
+
+# Iterate array to check every file and extension
+for filename in "${files[@]}"; do
+  if contains "${filename#*.}" "${front_end_ext[@]}"; then
+    front_end_files="${front_end_files} ${filename}"
+  elif contains "${filename#*.}" "${php_ext[@]}"; then
+    php_files="${php_files} ./${filename}"
+  elif contains "${filename##*.}" "${gherkin_ext[@]}"; then
+    gherkin_files="${gherkin_files} ${filename}"
+  fi
+done
+
+# Frontend files
+if [[ "$front_end_files" != "" ]]; then
+  echo -e "${GREEN}Fixing Frontend files code style...${NC}"
+  "$dir"/prettier-eslint ${front_end_files##*( )} --write --single-quote --print-width=120
+fi
+
+# Gherkin files
+if [[ "$gherkin_files" != "" ]]; then
+  echo -e "${GREEN}Fixing Gherkin files code style...${NC}"
+  echo ${gherkin_files}
+  "$dir"/gherkin-cs-fixer ${gherkin_files##*( )}
+fi
+
+# PHP files
+if [[ "$php_files" != "" ]]; then
+  echo -e "${GREEN}Fixing PHP files code style...${NC}"
+  echo ${php_files}
+  "$dir"/php-cs-fixer ${php_files##*( )} --config=.php_cs.dist --allow-risky=yes
+fi
+
+echo -e "${GREEN}Success!!!${NC}"

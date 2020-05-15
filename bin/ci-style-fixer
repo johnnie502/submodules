@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+set -eu
+
+root=$(dirname "$0")
+files="$(git diff --diff-filter=CMTR --name-only origin/master...HEAD)"
+
+#######################################
+# Set the git branch and tracker to that of the pull request
+#
+# Arguments:
+#   1 the url of the pull requests branch
+#   2 the ref of the pull requests branch
+#######################################
+set_pull_request_branch () {
+    local git_url=$1
+    local git_ref=$2
+
+    git remote add temp ${git_url}
+    git fetch temp
+    git checkout --track temp/${git_ref}
+}
+
+#######################################
+# Retrieve the details of the pull request from the github api
+#
+# Globals:
+#   GITHUB_OAUTH
+#   CIRCLE_PROJECT_USERNAME
+#   CIRCLE_PROJECT_REPONAME
+#   CIRCLE_PR_NUMBER
+#######################################
+get_pr_details () {
+    echo curl -H "Authorization: token $GITHUB_OAUTH" -H "Accept: application/vnd.github.shadow-cat-preview+json" \
+     -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${CIRCLE_PR_NUMBER}
+}
+
+#######################################
+# Fix and stage files
+#
+# Arguments:
+#   1 the files to fix / stage
+#######################################
+fix_and_stage_styles () {
+    local files=$1
+
+    ./style-fixer ${files}
+    echo ${files} | xargs git add
+}
+
+#######################################
+# Checks if any files have been fixed
+# exits if not
+#######################################
+exit_if_no_changes () {
+    if [[ $(git status | grep -Ec 'Changes to be committed') -eq 0 ]]; then
+      echo "No style issues found moving on..."
+      exit 0
+    fi
+}
+
+#######################################
+# Applies file changes and exits
+#######################################
+apply_changes_and_exit () {
+    echo "Found style issues. pushing back to branch..."
+    git commit -m"Apply code style fixes"
+    git push
+    exit 1
+}
+
+fix_and_stage_styles ${files}
+
+exit_if_no_changes
+
+api_response=$(get_pr_details)
+
+git_url=$(echo ${api_response} | jq '.head.repo.git_url' | sed -e 's/^"//' -e 's/"$//')
+
+git_ref=$(echo ${api_response} | jq '.head.ref' | sed -e 's/^"//' -e 's/"$//')
+
+retrieve_and_set_pull_request_branch ${git_url} ${git_ref}
+
+apply_changes_and_exit
