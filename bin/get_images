@@ -4,7 +4,7 @@ set -eu
 
 export DOCKER_REGISTRY_HOST=registry.hub.docker.com
 export DOCKER_REGISTRY_ACCOUNT=medology
-export GCR_HOST=us.gcr.io
+export GCR_HOST=gcr.io
 export GOOGLE_PROJECT_ID=docker-1000101
 
 export PHP_CS_FIXER_REPO=php-cs-fixer
