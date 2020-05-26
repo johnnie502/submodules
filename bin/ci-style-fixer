@@ -31,8 +31,8 @@ set_pull_request_branch () {
 #   CIRCLE_PR_NUMBER
 #######################################
 get_pr_details () {
-    echo curl -H "Authorization: token $GITHUB_OAUTH" -H "Accept: application/vnd.github.shadow-cat-preview+json" \
-     -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${CIRCLE_PR_NUMBER}
+    echo $(curl -H "Authorization: token $GITHUB_OAUTH" -H "Accept: application/vnd.github.shadow-cat-preview+json" \
+    -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${CIRCLE_PR_NUMBER})
 }
 
 #######################################
@@ -44,7 +44,7 @@ get_pr_details () {
 fix_and_stage_styles () {
     local files=$1
 
-    "$root"/style-fixer ${files}
+    "$root"/style-fixer "$files"
     echo ${files} | xargs git add
 }
 
@@ -79,6 +79,6 @@ git_url=$(echo ${api_response} | jq '.head.repo.git_url' | sed -e 's/^"//' -e 's
 
 git_ref=$(echo ${api_response} | jq '.head.ref' | sed -e 's/^"//' -e 's/"$//')
 
-retrieve_and_set_pull_request_branch ${git_url} ${git_ref}
+set_pull_request_branch "$git_url" "$git_ref"
 
 apply_changes_and_exit
