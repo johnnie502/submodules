@@ -31,8 +31,8 @@ set_pull_request_branch () {
 #   CIRCLE_PR_NUMBER
 #######################################
 get_pr_details () {
-    echo curl -H "Authorization: token $GITHUB_OAUTH" -H "Accept: application/vnd.github.shadow-cat-preview+json" \
-     -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${CIRCLE_PR_NUMBER}
+    echo $(curl -H "Authorization: token $GITHUB_OAUTH" -H "Accept: application/vnd.github.shadow-cat-preview+json" \
+    -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${CIRCLE_PR_NUMBER})
 }
 
 #######################################
