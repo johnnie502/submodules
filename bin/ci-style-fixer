@@ -44,7 +44,7 @@ get_pr_details () {
 fix_and_stage_styles () {
     local files=$1
 
-    "$root"/style-fixer "$files"
+    "$root"/style-fixer ${files}
     echo ${files} | xargs git add
 }
 
@@ -69,7 +69,7 @@ apply_changes_and_exit () {
     exit 1
 }
 
-fix_and_stage_styles ${files}
+fix_and_stage_styles "$files"
 
 exit_if_no_changes
 
