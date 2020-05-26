@@ -79,6 +79,6 @@ git_url=$(echo ${api_response} | jq '.head.repo.git_url' | sed -e 's/^"//' -e 's
 
 git_ref=$(echo ${api_response} | jq '.head.ref' | sed -e 's/^"//' -e 's/"$//')
 
-retrieve_and_set_pull_request_branch ${git_url} ${git_ref}
+set_pull_request_branch "$git_url" "$git_ref"
 
 apply_changes_and_exit
