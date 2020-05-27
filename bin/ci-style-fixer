@@ -44,8 +44,8 @@ get_pr_details () {
 fix_and_stage_styles () {
     local files=$1
 
-    "$root"/style-fixer ${files}
-    git add ${files}
+    "$root"/style-fixer "$files"
+    git add "$files"
 }
 
 #######################################
@@ -68,6 +68,20 @@ apply_changes_and_exit () {
     git push
     exit 1
 }
+
+#######################################
+# Exits if branch is on master
+#######################################
+exit_if_on_master () {
+    local branch="$(git symbolic-ref --short HEAD)"
+    if [[ "$branch" == "master" ]]; then
+        echo "Skipping style fixer since the branch is $branch"
+        exit 0
+    fi
+}
+
+
+exit_if_on_master
 
 fix_and_stage_styles "$files"
 
