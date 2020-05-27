@@ -45,7 +45,7 @@ fix_and_stage_styles () {
     local files=$1
 
     "$root"/style-fixer "$files"
-    git add "$files"
+    echo "$files" | xargs git add
 }
 
 #######################################
