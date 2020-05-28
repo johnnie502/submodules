@@ -16,9 +16,9 @@ set_pull_request_branch () {
     local git_url=$1
     local git_ref=$2
 
-    git remote add temp ${git_url}
-    git fetch temp
-    git checkout --track temp/${git_ref}
+    git remote add upstream ${git_url}
+    git fetch upstream
+    git checkout --track upstream/${git_ref}
 }
 
 #######################################
@@ -64,7 +64,7 @@ exit_if_no_changes () {
 #######################################
 apply_changes_and_exit () {
     echo "Found style issues. pushing back to branch..."
-    git commit -m"Apply code style fixes"
+    git commit -m"Apply code style fixes" --no-verify --no-edit
     git push
     exit 1
 }
