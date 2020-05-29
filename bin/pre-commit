@@ -30,7 +30,9 @@ if [[ "${CI:-}" == true ]] ; then
   remote="origin/master"
 fi
 
-files=$(get_fixable_files "$(git diff --staged --diff-filter=CMTR --name-only "$remote")")
+staged_files=$(git status --short | grep '^[MARCD]' | awk '{print $2}')
+
+files=$(get_fixable_files "$staged_files")
 
 if [[ "$files" != "" ]]; then
   "${ROOT}/bin/style-fixer" ${files##*( )}
