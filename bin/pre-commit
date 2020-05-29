@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+set -eu
+
+get_fixable_files () {
+  local files=$1
+
+  fixable_files=""
+
+  for file in $files
+  do
+    if echo "$file" | grep 'css\|scss\|html\|js\|php\|feature'; then
+      fixable_files="$fixable_files $file"
+    fi
+  done
+  echo $fixable_files
+}
+
+if [[ -z "${SNAP_NAME:=''}" ]]; then
+  echo "Can not run git hooks from within snap container."
+  echo "Manually commit or uninstall ${SNAP_NAME} with snap and then reinstall it without snap."
+  exit 1
+fi
+
+ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+
+remote="upstream/master"
+
+if [[ "${CI:-}" == true ]] ; then
+  remote="origin/master"
+fi
+
+files=$(get_fixable_files "$(git diff --staged --diff-filter=CMTR --name-only "$remote")")
+
+if [[ "$files" != "" ]]; then
+  "${ROOT}/bin/style-fixer" ${files##*( )}
+fi
+
+if [[ "$files" != "" ]]; then
+  git add $files
+fi
