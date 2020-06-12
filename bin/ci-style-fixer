@@ -3,7 +3,7 @@
 set -eu
 
 root=$(dirname "$0")
-files="$(git diff --diff-filter=CMTR --name-only origin/master...HEAD)"
+files="$(git diff --diff-filter=CMTRA --name-only origin/master...HEAD)"
 
 #######################################
 # Set the git branch and tracker to that of the pull request
