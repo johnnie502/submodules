@@ -12,27 +12,25 @@ set -eu
 delete_old_versions() {
   local service=$1
   local max_service_versions=$2
-  local versions=0
-  local ids=0
+  local ids=()
+  local limit=0
 
   echo ""
   echo "Checking number of versions for $service service"
-  versions=$(gcloud app versions list --service="$service" --format="table[no-heading](version.id)" | wc -l)
+  readarray -t ids < <(gcloud app versions list \
+    --service="$service" \
+    --filter="version.servingStatus=stopped" \
+    --format="table[no-heading](version.id)")
 
-  if [ "$versions" -le "$max_service_versions" ]; then
+  if [ "${#ids[@]}" -le "$max_service_versions" ]; then
     echo "No old versions to delete"
     return 0;
   fi
 
-  echo "Deleting $((versions - max_service_versions)) old versions"
+  limit=$(("${#ids[@]}" - max_service_versions))
 
-  ids=$(gcloud app versions list \
-    --service="$service" \
-    --filter="version.servingStatus=stopped" \
-    --limit=$((versions - max_service_versions)) \
-    --format="table[no-heading](version.id)")
-
-  for version in $ids
+  echo "Deleting $limit old versions"
+  for version in "${ids[@]::limit}"
   do
     yes | gcloud app versions delete --service="$service" "$version"
   done
