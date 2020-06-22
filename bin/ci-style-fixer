@@ -83,7 +83,9 @@ exit_if_on_master () {
 
 exit_if_on_master
 
-fix_and_stage_styles "$files"
+if [[ ! -z "$files" ]];then
+    fix_and_stage_styles "$files"
+fi
 
 exit_if_no_changes
 
