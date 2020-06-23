@@ -45,7 +45,7 @@ if [[ -L "$hooks" ]]; then
 else
   echo "Git hooks symbolic link is not in place."
   if [[ -e "$hooks" ]]; then
-    echo "Git hooks dir present. Removing..."
+    exit_if_not_willing_to_remove_dir
     rm -rf "$hooks"
   fi
 
