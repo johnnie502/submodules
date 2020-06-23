@@ -2,32 +2,54 @@
 
 set -eu
 
-dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+dir="$(pwd)"
 
 hooks="$dir"/.git/hooks
 
 echo "Checking Git hooks..."
 
-if [ -L "$hooks" ]; then
-  echo "Git hooks symbolic link is already in place."
-  if [ `readlink "$hooks"` == ../hooks ]; then
-    echo "Symbolic link is configured correctly."
-  else
-    echo "Symbolic link is NOT configured correctly. Removing..."
-    rm "$hooks"
+#######################################
+# Prompts user to ask if we can delete
+# hooks folder, exits if answer is no
+#######################################
+exit_if_not_willing_to_remove_dir () {
+    while true; do
+        read -p "Symbolic link is NOT configured correctly. We need to remove the git hooks directory. Is that okay? [Yy/Nn]" yn
+        case "$yn" in
+            [Yy]* ) break;;
+            [Nn]* ) exit 1;;
+            * ) echo "Please answer yes [Yy] or no [Nn].";;
+        esac
+    done
+}
 
+#######################################
+# Create the hooks sym link
+#######################################
+create_sym_link () {
     echo "Creating symbolic link..."
     ln -s ../hooks "$hooks"
+}
+
+if [[ -L "$hooks" ]]; then
+  echo "Git hooks symbolic link is already in place."
+  if [[ `readlink "$hooks"` == ../hooks ]]; then
+    echo "Symbolic link is configured correctly."
+  else
+    exit_if_not_willing_to_remove_dir
+    echo "Removing..."
+    rm "$hooks"
+
+    create_sym_link
   fi
 else
   echo "Git hooks symbolic link is not in place."
-  if [ -e "$hooks" ]; then
+  if [[ -e "$hooks" ]]; then
     echo "Git hooks dir present. Removing..."
     rm -rf "$hooks"
   fi
 
-  echo "Creating symbolic link..."
-  ln -s ../hooks "$hooks"
+  create_sym_link
 fi
 
 echo "Git hooks symbolic link setup is complete."
