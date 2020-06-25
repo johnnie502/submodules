@@ -14,11 +14,11 @@ echo "Checking Git hooks..."
 #######################################
 exit_if_not_willing_to_remove_dir () {
     while true; do
-        read -p "Symbolic link is NOT configured correctly. We need to remove the git hooks directory. Is that okay? [Yy/Nn]" yn
-        case "$yn" in
+        read -p "Symbolic link is NOT configured correctly. We need to remove the git hooks directory. Is that okay? (y/n)" response
+        case "$response" in
             [Yy]* ) break;;
             [Nn]* ) exit 1;;
-            * ) echo "Please answer yes [Yy] or no [Nn].";;
+            * ) echo "Please answer yes (y) or no (n).";;
         esac
     done
 }
