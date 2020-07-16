@@ -53,3 +53,21 @@ apply_no_qa_label () {
     --data '{"labels": ["No QA"]}' \
     -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues/${CIRCLE_PR_NUMBER}
 }
+
+#######################################
+# Removes the No Qa label via the API
+#
+# Globals:
+#   GITHUB_OAUTH
+#   CIRCLE_PROJECT_USERNAME
+#   CIRCLE_PROJECT_REPONAME
+#   CIRCLE_PR_NUMBER
+#######################################
+remove_no_qa_label () {
+    echo "Removing No QA label"
+    curl -H "Authorization: token $GITHUB_OAUTH" \
+    -H "Accept: application/vnd.github.shadow-cat-preview+json" \
+    -H "Content-Type: application/json" \
+    --request DELETE \
+    -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues/${CIRCLE_PR_NUMBER}/labels/No%20QA
+}
