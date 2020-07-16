@@ -86,3 +86,18 @@ label_and_exit_if_repo_not_qa_able () {
     exit 0
   fi
 }
+
+#######################################
+# Checks the changes files in the PR
+# and exits if they are QA able
+#######################################
+remove_label_and_exit_if_files_are_qa_able () {
+  for file in "$(git diff --diff-filter=CMTRA --name-only origin/master...HEAD)"
+  do
+    if [[ ! -z "$(echo "$file" | grep -v '.feature\|features/\|tests/\|.md\|submodules\|.circleci')" ]]; then
+        echo "Some files are considered QA'able: $file"
+        remove_no_qa_label
+        exit 0
+    fi
+  done
+}
