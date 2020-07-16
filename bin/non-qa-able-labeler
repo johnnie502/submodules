@@ -34,3 +34,22 @@ non_qa_able_repos=(
   'Team-Standards-and-Procedures',
   'bitpay-api-microservice',
 )
+
+#######################################
+# Applies the No QA label to the PR
+#
+# Globals:
+#   GITHUB_OAUTH
+#   CIRCLE_PROJECT_USERNAME
+#   CIRCLE_PROJECT_REPONAME
+#   CIRCLE_PR_NUMBER
+#######################################
+apply_no_qa_label () {
+    echo "Applying No QA label"
+    curl -H "Authorization: token $GITHUB_OAUTH" \
+    -H "Accept: application/vnd.github.shadow-cat-preview+json" \
+    -H "Content-Type: application/json" \
+    --request POST \
+    --data '{"labels": ["No QA"]}' \
+    -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues/${CIRCLE_PR_NUMBER}
+}
