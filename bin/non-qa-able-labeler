@@ -71,3 +71,18 @@ remove_no_qa_label () {
     --request DELETE \
     -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues/${CIRCLE_PR_NUMBER}/labels/No%20QA
 }
+
+#######################################
+# Labels the PR with no QA label then
+# exits
+#
+# Globals:
+#   non_qa_able_repos
+#   CIRCLE_PROJECT_REPONAME
+#######################################
+label_and_exit_if_repo_not_qa_able () {
+  if [[ " ${non_qa_able_repos[@]} " =~ "$CIRCLE_PROJECT_REPONAME" ]]; then
+    apply_no_qa_label
+    exit 0
+  fi
+}
