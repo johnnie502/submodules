@@ -101,3 +101,9 @@ remove_label_and_exit_if_files_are_qa_able () {
     fi
   done
 }
+
+label_and_exit_if_repo_not_qa_able
+
+remove_label_and_exit_if_files_are_qa_able
+
+apply_no_qa_label
