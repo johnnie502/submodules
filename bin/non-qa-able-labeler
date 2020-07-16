@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+set -eu
+
+# List of repositories considered not QA able
+non_qa_able_repos=(
+  'laravel-sodium',
+  'submodules',
+  'consultation-provider',
+  'gherking-cs-fixer',
+  'FlexibleMink',
+  'iLab-php-parser',
+  'phpunit-parallel-runner',
+  'spinify-php-client',
+  'medivo-client',
+  'BehatPaypalContext',
+  'behat-google-place-autocomplete',
+  'BehatFindALabContext',
+  'docker-hub',
+  'docker-php-cs-fixer',
+  'geo-location',
+  'iLab-php-client',
+  'PaymentProcessor',
+  'quest-client',
+  'Scripts',
+  'google-maps-mock-api',
+  'wheniwork-php-client',
+  'livechat-spinify-bridge',
+  'docker-ng-cli-karma',
+  'gae-stop-old-versions-orb',
+  'gae-prune-old-versions-orb',
+  '.github',
+  'IP-Phone-Provisioning',
+  'Team-Standards-and-Procedures',
+  'bitpay-api-microservice',
+)
