@@ -64,7 +64,7 @@ apply_no_qa_label () {
 #   CIRCLE_PROJECT_REPONAME
 #   CIRCLE_PR_NUMBER
 #######################################
-remove_no_qa_label () {
+remove_no_qa_label_if_exists () {
     echo "Removing No QA label"
     curl -H "Authorization: token $GITHUB_OAUTH" \
         -H "Accept: application/vnd.github.shadow-cat-preview+json" \
@@ -93,7 +93,7 @@ label_and_exit_if_repo_not_qa_able () {
 # Checks the changed files in the PR
 # and exits if they are QA able
 #######################################
-remove_label_and_exit_if_files_are_qa_able () {
+exit_if_files_qa_able () {
   for file in "$(git diff --name-only origin/master...HEAD)"
   do
 
@@ -102,16 +102,14 @@ remove_label_and_exit_if_files_are_qa_able () {
 
     if [[ ! -z qa_able_files ]] && [[ -z non_comment_updates ]]; then
         echo "Some files are considered QA'able: $file"
-        remove_no_qa_label
+        remove_no_qa_label_if_exists
         exit 0
-    else
-        echo "Not QA able"
     fi
   done
 }
 
 label_and_exit_if_repo_not_qa_able
 
-remove_label_and_exit_if_files_are_qa_able
+exit_if_files_qa_able
 
 apply_no_qa_label
