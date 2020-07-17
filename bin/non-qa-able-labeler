@@ -55,7 +55,7 @@ apply_no_qa_label () {
 }
 
 #######################################
-# Removes the No Qa label via the API
+# Removes the No Qa label from the PR
 #
 # Globals:
 #   GITHUB_OAUTH
@@ -73,8 +73,9 @@ remove_no_qa_label () {
 }
 
 #######################################
-# Labels the PR with no QA label then
-# exits
+# Checks if the Repository is QA'able
+# If it is not it will add the No QA
+# label and exit
 #
 # Globals:
 #   non_qa_able_repos
@@ -88,7 +89,7 @@ label_and_exit_if_repo_not_qa_able () {
 }
 
 #######################################
-# Checks the changes files in the PR
+# Checks the changed files in the PR
 # and exits if they are QA able
 #######################################
 remove_label_and_exit_if_files_are_qa_able () {
