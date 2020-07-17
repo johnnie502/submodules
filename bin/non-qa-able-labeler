@@ -2,6 +2,11 @@
 
 set -eu
 
+project_name=$1
+repo_name=$2
+pull_number=$3
+auth_token=$4
+
 # List of repositories considered not QA able
 non_qa_able_repos=(
   'laravel-sodium',
@@ -38,19 +43,19 @@ non_qa_able_repos=(
 # Applies the No QA label to the PR
 #
 # Globals:
-#   GITHUB_OAUTH
-#   CIRCLE_PROJECT_USERNAME
-#   CIRCLE_PROJECT_REPONAME
-#   CIRCLE_PR_NUMBER
+#   auth_token
+#   project_name
+#   repo_name
+#   project_name
 #######################################
 apply_no_qa_label () {
     echo "Applying No QA label"
-    curl -H "Authorization: token $GITHUB_OAUTH" \
+    curl -H "Authorization: token $auth_token" \
         -H "Accept: application/vnd.github.shadow-cat-preview+json" \
         -H "Content-Type: application/json" \
         --request POST \
         --data '{"labels": ["No QA"]}' \
-        -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues/${CIRCLE_PR_NUMBER}/labels
+        -S https://api.github.com/repos/${project_name}/${repo_name}/issues/${project_name}/labels
 }
 
 #######################################
@@ -59,18 +64,18 @@ apply_no_qa_label () {
 # exits 0 and the script goes on
 #
 # Globals:
-#   GITHUB_OAUTH
-#   CIRCLE_PROJECT_USERNAME
-#   CIRCLE_PROJECT_REPONAME
-#   CIRCLE_PR_NUMBER
+#   auth_token
+#   project_name
+#   repo_name
+#   project_name
 #######################################
 remove_no_qa_label_if_exists () {
     echo "Removing No QA label"
-    curl -H "Authorization: token $GITHUB_OAUTH" \
+    curl -H "Authorization: token $auth_token" \
         -H "Accept: application/vnd.github.shadow-cat-preview+json" \
         -H "Content-Type: application/json" \
         --request DELETE \
-        -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues/${CIRCLE_PR_NUMBER}/labels/No%20QA
+        -S https://api.github.com/repos/${project_name}/${repo_name}/issues/${project_name}/labels/No%20QA
 }
 
 #######################################
@@ -80,10 +85,10 @@ remove_no_qa_label_if_exists () {
 #
 # Globals:
 #   non_qa_able_repos
-#   CIRCLE_PROJECT_REPONAME
+#   repo_name
 #######################################
 label_and_exit_if_repo_not_qa_able () {
-  if [[ " ${non_qa_able_repos[@]} " =~ "$CIRCLE_PROJECT_REPONAME" ]]; then
+  if [[ " ${non_qa_able_repos[@]} " =~ "$repo_name" ]]; then
     apply_no_qa_label
     exit 0
   fi
