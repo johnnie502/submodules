@@ -32,7 +32,6 @@ non_qa_able_repos=(
   '.github',
   'IP-Phone-Provisioning',
   'Team-Standards-and-Procedures',
-  'bitpay-api-microservice',
 )
 
 #######################################
@@ -47,15 +46,17 @@ non_qa_able_repos=(
 apply_no_qa_label () {
     echo "Applying No QA label"
     curl -H "Authorization: token $GITHUB_OAUTH" \
-    -H "Accept: application/vnd.github.shadow-cat-preview+json" \
-    -H "Content-Type: application/json" \
-    --request POST \
-    --data '{"labels": ["No QA"]}' \
-    -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues/${CIRCLE_PR_NUMBER}
+        -H "Accept: application/vnd.github.shadow-cat-preview+json" \
+        -H "Content-Type: application/json" \
+        --request POST \
+        --data '{"labels": ["No QA"]}' \
+        -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues/${CIRCLE_PR_NUMBER}/labels
 }
 
 #######################################
 # Removes the No Qa label from the PR
+# If the label doesn't exist, curl
+# exits 0 and the script goes on
 #
 # Globals:
 #   GITHUB_OAUTH
@@ -66,10 +67,10 @@ apply_no_qa_label () {
 remove_no_qa_label () {
     echo "Removing No QA label"
     curl -H "Authorization: token $GITHUB_OAUTH" \
-    -H "Accept: application/vnd.github.shadow-cat-preview+json" \
-    -H "Content-Type: application/json" \
-    --request DELETE \
-    -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues/${CIRCLE_PR_NUMBER}/labels/No%20QA
+        -H "Accept: application/vnd.github.shadow-cat-preview+json" \
+        -H "Content-Type: application/json" \
+        --request DELETE \
+        -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/issues/${CIRCLE_PR_NUMBER}/labels/No%20QA
 }
 
 #######################################
@@ -99,7 +100,7 @@ remove_label_and_exit_if_files_are_qa_able () {
     local qa_able_files="$(echo "$file" | grep -v '.feature\|features/\|tests/\|.md\|submodules\|.circleci')"
     local non_comment_updates="$(git diff -w -G'(^[^\*# /])|(^#\w)|(^\s+[^\*#/])'  origin/master...HEAD $file)"
 
-    if [[ ! -z qa_able_files && ! -z non_comment_updates ]]; then
+    if [[ ! -z qa_able_files ]] && [[ -z non_comment_updates ]]; then
         echo "Some files are considered QA'able: $file"
         remove_no_qa_label
         exit 0
