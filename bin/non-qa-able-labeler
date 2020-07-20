@@ -55,7 +55,7 @@ apply_no_qa_label () {
         -H "Content-Type: application/json" \
         --request POST \
         --data '{"labels": ["No QA"]}' \
-        -S https://api.github.com/repos/${project_name}/${repo_name}/issues/${project_name}/labels
+        -S https://api.github.com/repos/${project_name}/${repo_name}/issues/${pull_number}/labels
 }
 
 #######################################
@@ -75,7 +75,7 @@ remove_no_qa_label_if_exists () {
         -H "Accept: application/vnd.github.shadow-cat-preview+json" \
         -H "Content-Type: application/json" \
         --request DELETE \
-        -S https://api.github.com/repos/${project_name}/${repo_name}/issues/${project_name}/labels/No%20QA
+        -S https://api.github.com/repos/${project_name}/${repo_name}/issues/${pull_number}/labels/No%20QA
 }
 
 #######################################
@@ -105,8 +105,11 @@ remove_label_and_exit_if_files_are_qa_able () {
     local qa_able_files="$(echo "$file" | grep -v '.feature\|features/\|tests/\|.md\|submodules\|.circleci')"
     local non_comment_updates="$(git diff -w -G'(^[^\*# /])|(^#\w)|(^\s+[^\*#/])'  origin/master...HEAD $file)"
 
-    if [[ ! -z qa_able_files ]] && [[ -z non_comment_updates ]]; then
+    if [[ ! -z "$qa_able_files" && ! -z "$non_comment_updates" ]]; then
+        echo ""
         echo "Some files are considered QA'able: $file"
+        echo "$non_comment_updates"
+        echo ""
         remove_no_qa_label_if_exists
         exit 0
     fi
