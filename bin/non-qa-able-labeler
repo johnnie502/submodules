@@ -99,11 +99,16 @@ label_and_exit_if_repo_not_qa_able () {
 # and exits if they are QA able
 #######################################
 remove_label_and_exit_if_files_are_qa_able () {
-  for file in $(git diff --diff-filter=d --name-only origin/master...HEAD)
+  for file in $(git diff --name-only origin/master...HEAD)
   do
-
+    local non_comment_updates=""
     local qa_able_files="$(echo "$file" | grep -v '.feature\|features/\|tests/\|.md\|submodules\|.circleci')"
-    local non_comment_updates="$(git diff -w -G'(^[^\*# /])|(^#\w)|(^\s+[^\*#/])'  origin/master...HEAD $file)"
+
+    if [[ ! -f "$file" ]]; then
+       non_comment_updates="File was deleted"
+    else
+       non_comment_updates="$(git diff -w -G'(^[^\*# /])|(^#\w)|(^\s+[^\*#/])'  origin/master...HEAD $file)"
+    fi
 
     if [[ ! -z "$qa_able_files" && ! -z "$non_comment_updates" ]]; then
         echo ""
