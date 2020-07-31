@@ -108,7 +108,7 @@ remove_label_and_exit_if_files_are_qa_able () {
     if [[ ! -f "$file" ]]; then
        non_comment_updates="File was deleted"
     else
-       non_comment_updates="$(git diff -w -G'(^[^\*# /])|(^#\w)|(^\s+[^\*#/])'  origin/master...HEAD $file)"
+       non_comment_updates="$(git diff -G'(^[^\*# /])|(^#\w)|(^\s+[^\*#/])'  origin/master...HEAD $file)"
     fi
 
     echo "Checking file $file"
