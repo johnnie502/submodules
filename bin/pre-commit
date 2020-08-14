@@ -30,7 +30,7 @@ if [[ "${CI:-}" == true ]] ; then
   remote="origin/master"
 fi
 
-staged_files=$(git status --short | grep '^[MARC]' | awk '{print $2}')
+staged_files=$(git status --short | grep '^[MARC]' | awk -F " " '{print $NF}')
 
 files=$(get_fixable_files "$staged_files")
 
