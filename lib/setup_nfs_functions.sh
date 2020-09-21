@@ -3,6 +3,30 @@
 set -eu
 
 #######################################
+# Setup NFS server on Mac
+#######################################
+setupNfsServer() {
+  if showmount -e | grep -qF '/System/Volumes/Data'; then
+    echo "NFS exports ready"
+  else
+    echo "Setting up the NFS server, your password will be required..."
+
+    # Allow connections from any port
+    writeToFile 'Allow connections from any port' 'nfs.server.mount.require_resv_port = 0' '/etc/nfs.conf'
+
+    # Config file system exports on macOS Catalina
+    uid=${UID:-"$(id -u "$(whoami)")"}
+    gid=${GID:-"$(id -g "$(whoami)")"}
+    writeToFile 'Export file system' "/System/Volumes/Data -alldirs -mapall=${uid}:${gid} localhost" '/etc/exports'
+
+    echo " - Restarting the NFS server"
+    sudo nfsd restart
+
+    echo "NFS exports ready"
+  fi
+}
+
+#######################################
 # Write a line to a file using sudo
 #
 # Arguments:
@@ -33,30 +57,30 @@ writeToFile() {
 #   4 the volume opts
 #######################################
 createDockerVolume() {
-  local VOLUME_NAME=$1
-  local VOLUME_PATH=$2
-  local VOLUME_TYPE=$3
-  local VOLUME_OPTS=$4
+  local volume_name=$1
+  local volume_path=$2
+  local volume_type=$3
+  local volume_opts=$4
 
-  echo "Creating Docker Volume ${VOLUME_NAME} for path ${VOLUME_PATH}"
+  echo "Creating Docker Volume ${volume_name} for path ${volume_path}"
 
-  if [[ ! -e ${VOLUME_PATH} ]]; then
-    echo "${VOLUME_PATH} doesn't exist, creating the directory..." 1>&2
-    mkdir ${VOLUME_PATH}
-  elif [[ ! -d ${VOLUME_PATH} ]]; then
-    echo "${VOLUME_PATH} already exists but is not a directory" 1>&2
+  if [[ ! -e ${volume_path} ]]; then
+    echo "${volume_path} doesn't exist, creating the directory..." 1>&2
+    mkdir ${volume_path}
+  elif [[ ! -d ${volume_path} ]]; then
+    echo "${volume_path} already exists but is not a directory" 1>&2
   fi
 
-  if [[ $VOLUME_TYPE = 'nfs' ]]; then
-    VOLUME_PATH=":${VOLUME_PATH}"
+  if [[ $volume_type = 'nfs' ]]; then
+    volume_path=":${volume_path}"
   fi
 
   docker volume create \
     --driver local \
-    --opt type="${VOLUME_TYPE}" \
-    --opt o="${VOLUME_OPTS}" \
-    --opt device="${VOLUME_PATH}" \
-    "${VOLUME_NAME}" > /dev/null
+    --opt type="${volume_type}" \
+    --opt o="${volume_opts}" \
+    --opt device="${volume_path}" \
+    "${volume_name}" > /dev/null
 }
 
 #######################################
@@ -69,12 +93,12 @@ createDockerVolume() {
 #   4 the volume opts
 #######################################
 recreateVolumeIfMountFromDifferentFolder() {
-  local VOLUME_NAME=$1
-  local VOLUME_PATH=$2
-  local VOLUME_TYPE=$3
-  local VOLUME_OPTS=$4
-  if [[ $(docker volume inspect --format '{{.Options.device}}' ${VOLUME_NAME}) != ":${VOLUME_PATH}" ]]; then
-    docker volume rm "${VOLUME_NAME}"
-    createDockerVolume "${VOLUME_NAME}" "${VOLUME_PATH}" "${VOLUME_TYPE}" "${VOLUME_OPTS}"
+  local volume_name=$1
+  local volume_path=$2
+  local volume_type=$3
+  local volume_opts=$4
+  if [[ $(docker volume inspect --format '{{.Options.device}}' ${volume_name}) != ":${volume_path}" ]]; then
+    docker volume rm "${volume_name}"
+    createDockerVolume "${volume_name}" "${volume_path}" "${volume_type}" "${volume_opts}"
   fi
 }
