@@ -94,8 +94,6 @@ get_fixable_files () {
     echo "$fixable_files"
 }
 
-
-
 exit_if_on_master
 
 fixable_files=$(get_fixable_files)
