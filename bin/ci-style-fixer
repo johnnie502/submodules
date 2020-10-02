@@ -3,7 +3,6 @@
 set -eu
 
 root=$(dirname "$0")
-files="$(git diff --diff-filter=CMTRA --name-only origin/master...HEAD)"
 
 #######################################
 # Set the git branch and tracker to that of the pull request
@@ -84,9 +83,8 @@ exit_if_on_master () {
 # Filter fixable files
 #######################################
 get_fixable_files () {
-    local files=$1
+    files="$(git diff --diff-filter=CMTRA --name-only origin/master...HEAD)"
     fixable_files=""
-
     for file in $files
     do
       if echo "$file" | grep 'css\|scss\|html\|js\|php\|feature'; then
@@ -100,7 +98,7 @@ get_fixable_files () {
 
 exit_if_on_master
 
-fixable_files=$(get_fixable_files "$files")
+fixable_files=$(get_fixable_files)
 
 if [[ ! -z "$fixable_files" ]];then
     fix_and_stage_styles "$fixable_files"
