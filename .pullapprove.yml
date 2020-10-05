@@ -1,1 +1,2 @@
-config/.pullapprove.yml
+version: 3
+extends: "extends: "https://api.github.com/repos/medology/Scripts/contents/Pull%20Approve/crumpet.pullapprove.yml?ref=master"
