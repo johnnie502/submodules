@@ -97,7 +97,7 @@ recreateVolumeIfMountFromDifferentFolder() {
   local volume_path=$2
   local volume_type=$3
   local volume_opts=$4
-  if [[ $(docker volume inspect --format '{{.Options.device}}' ${volume_name} | sed 's/://g') != "${volume_path}" ]]; then
+  if [[ $(docker volume inspect --format '{{.Options.device}}' ${volume_name} | sed 's/^://') != "${volume_path}" ]]; then
     docker volume rm "${volume_name}"
     createDockerVolume "${volume_name}" "${volume_path}" "${volume_type}" "${volume_opts}"
   fi
