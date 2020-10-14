@@ -21,11 +21,12 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 contains() {
   local e match="$1"
   shift
+  match="${match#*.}"
   for e; do [[ "$e" == "$match" ]] && return 0; done
   return 1
 }
 
-front_end_ext=('css' 'scss' 'html' 'js')
+front_end_ext=('css' 'scss' 'html' 'js' 'ts')
 php_ext=('php')
 gherkin_ext=('feature')
 front_end_files=""
@@ -38,7 +39,7 @@ ifs=' ' read -r -a files <<<"$@"
 # Iterate array to check every file and extension
 for filename in "${files[@]}"; do
   if contains "${filename#*.}" "${front_end_ext[@]}"; then
-    front_end_files="${front_end_files} ${filename}"
+    front_end_files="${front_end_files} /var/www/${filename}"
   elif contains "${filename#*.}" "${php_ext[@]}"; then
     php_files="${php_files} ./${filename}"
   elif contains "${filename##*.}" "${gherkin_ext[@]}"; then
