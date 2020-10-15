@@ -44,7 +44,9 @@ if [[ -L "$hooks" ]]; then
   if [[ `readlink "$hooks"` == ../hooks ]]; then
     echo "Symbolic link is configured correctly."
   else
-    exit_if_not_willing_to_remove_dir
+    if [[ "${CI:-}" != true ]] ; then
+        exit_if_not_willing_to_remove_dir
+    fi
     echo "Removing..."
     rm "$hooks"
 
@@ -53,7 +55,9 @@ if [[ -L "$hooks" ]]; then
 else
   echo "Git hooks symbolic link is not in place."
   if [[ -e "$hooks" ]]; then
-    exit_if_not_willing_to_remove_dir
+    if [[ "${CI:-}" != true ]] ; then
+        exit_if_not_willing_to_remove_dir
+    fi
     rm -rf "$hooks"
   fi
 
