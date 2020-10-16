@@ -21,11 +21,12 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 contains() {
   local e match="$1"
   shift
+  match="${match#*.}"
   for e; do [[ "$e" == "$match" ]] && return 0; done
   return 1
 }
 
-front_end_ext=('css' 'scss' 'html' 'js')
+front_end_ext=('css' 'scss' 'html' 'js' 'ts')
 php_ext=('php')
 gherkin_ext=('feature')
 front_end_files=""
