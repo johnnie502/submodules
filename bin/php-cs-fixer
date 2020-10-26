@@ -13,5 +13,6 @@ docker run \
     ${TTY} \
     -i \
     -v $(pwd):/workdir:delegated \
+    --rm \
     ${PHP_CS_FIXER_IMAGE} \
     fix "$@"
