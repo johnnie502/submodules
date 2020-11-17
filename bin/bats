@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -eu
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+. ${DIR}/get_tty
+. ${DIR}/get_local_user
+. ${DIR}/get_images
+
+docker run -it \
+      -e LOCAL_USER_ID=${LOCAL_USER_ID:-} \
+      --volume "$PWD":/workdir \
+      ${TTY} \
+      -i \
+      --rm \
+      ${BATS_IMAGE} bats "$@"
