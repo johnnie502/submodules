@@ -5,6 +5,7 @@ set -eu
 export DOCKER_REGISTRY_HOST=registry.hub.docker.com
 export DOCKER_REGISTRY_ACCOUNT=medology
 export GCR_HOST=gcr.io
+export GCR_US_HOST=us.gcr.io
 export GOOGLE_PROJECT_ID=docker-1000101
 
 export PHP_CS_FIXER_REPO=php-cs-fixer
@@ -21,4 +22,4 @@ export PRETTIER_ESLINT_IMAGE=${DOCKER_REGISTRY_HOST}/${DOCKER_REGISTRY_ACCOUNT}/
 
 export BATS_REPO=bats
 export BATS_TAG=php7.3-laravel5.7
-export BATS_IMAGE=${GCR_HOST}/${GOOGLE_PROJECT_ID}/${BATS_REPO}:${BATS_TAG}
+export BATS_IMAGE=${GCR_US_HOST}/${GOOGLE_PROJECT_ID}/${BATS_REPO}:${BATS_TAG}
