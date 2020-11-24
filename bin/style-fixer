@@ -29,9 +29,11 @@ contains() {
 front_end_ext=('css' 'scss' 'html' 'js' 'ts')
 php_ext=('php')
 gherkin_ext=('feature')
+java_ext=('java')
 front_end_files=""
 php_files=""
 gherkin_files=""
+java_files=""
 
 # Split files into array
 ifs=' ' read -r -a files <<<"$@"
@@ -44,6 +46,8 @@ for filename in "${files[@]}"; do
     php_files="${php_files} ./${filename}"
   elif contains "${filename##*.}" "${gherkin_ext[@]}"; then
     gherkin_files="${gherkin_files} ${filename}"
+  elif contains "${filename##*.}" "${java_ext[@]}"; then
+    java_files="${java_files} ${filename}"
   fi
 done
 
@@ -65,6 +69,13 @@ if [[ "$php_files" != "" ]]; then
   echo -e "${GREEN}Fixing PHP files code style...${NC}"
   echo ${php_files}
   "$dir"/php-cs-fixer ${php_files##*( )} --config=.php_cs.dist --allow-risky=yes
+fi
+
+# Java files
+if [[ "$java_files" != "" ]]; then
+  echo -e "${GREEN}Fixing Java files code style...${NC}"
+  echo ${java_files}
+  "$dir"/java-styler --write --aosp ${java_files##*( )}
 fi
 
 echo -e "${GREEN}Success!!!${NC}"
