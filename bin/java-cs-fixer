@@ -3,16 +3,17 @@
 set -eu
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../" && pwd )"
 
 . ${dir}/get_local_user
 . ${dir}/get_tty
 . ${dir}/get_images
+. "$ROOT"/docker/lib/volumes.sh
 
 docker run \
     ${LOCAL_USER_ID:-} \
-    ${TTY} \
+    $TTY \
     --rm \
     -i \
-    -v $(pwd):/workdir:delegated \
-    -w /workdir \
-    ${JAVA_STYLER_IMAGE} "$@"
+    --mount source=$PROJECT_VOLUME,target=/workdir \
+    $JAVA_STYLER_IMAGE "$@"
