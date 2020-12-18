@@ -1,20 +1,19 @@
 #!/usr/bin/env bash
 
-set -euo -pipefail
+set -euo pipefail
 
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
 EXPECTED_VERSION=2.0.8
 EXPECTED_CHECKSUM=608432e9a850f02b527a661e6771546a10a8cc16e17363754c101f06d1ab03e53106d7aef2b5faa606d67523fcf33dc3
 
-# Check for existing installation
+# Check for existing installation.
 if [ -e "$ROOT"/bin/composer ]; then
     echo "Checking Composer version..."
     FOUND_VERSION=$( \
         cd "$ROOT" && ./bin/composer --version | \
         tail -1 | \
-        awk '{print $3}' | \
-        "$ROOT"/bin/linux-sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" \
+        awk '{print $3}' \
     )
 
     # Check version of installed composer
