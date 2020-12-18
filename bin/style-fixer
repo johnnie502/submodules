@@ -75,7 +75,7 @@ fi
 if [[ "$java_files" != "" ]]; then
   echo -e "$GREEN Fixing Java files code style...$NC"
   echo $java_files
-  "$dir"/java-cs-fixer --write --aosp ${java_files##*( )}
+  "$dir"/java-cs-fixer --replace --aosp ${java_files##*( )}
 fi
 
 echo -e "$GREEN Success!!!$NC"
