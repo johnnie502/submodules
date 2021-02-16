@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -eu
+
+ROOT="$(cd "$(dirname "$0")"/../ && pwd)"
+
+# File already exists
+if [ -f "$ROOT"/.npmrc ]; then
+  exit 0
+fi
+
+echo "Copying default .npmrc file"
+cp "$ROOT"/.npmrc.example "$ROOT"/.npmrc
+
+: "${NPM_TOKEN:=""}"
+
+if [ -z "$NPM_TOKEN" ]; then
+   echo "Please create github token with 'read:packages' scope and replace 'TOKEN' in your .npmrc file"
+else
+  sed -i "s/TOKEN/$NPM_TOKEN/" "$ROOT"/.npmrc
+fi

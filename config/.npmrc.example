@@ -1,0 +1,4 @@
+//npm.pkg.github.com/:_authToken=TOKEN
+registry=https://registry.yarnpkg.com/
+@Medology:registry=https://npm.pkg.github.com
+always-auth=true
