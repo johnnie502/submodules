@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")"/../ && pwd)"
+
+# File already exists
+if [ -f "$ROOT"/.npmrc ]; then
+  exit 0
+fi
+
+echo "Copying default .npmrc file"
+cp "$ROOT"/.npmrc.example "$ROOT"/.npmrc
+
+: "${NPM_TOKEN:=""}"
+
+# Update token manually if env variable not exists
+if [ -z "$NPM_TOKEN" ]; then
+   echo "Please create github token with 'read:packages' scope and replace 'TOKEN' in your .npmrc file"
+   exit 0
+fi
+
+# Replace token with env variable
+if [[ "$(uname)" == 'Darwin' ]]; then
+  # macOs
+  sed -i '' "s/TOKEN/$NPM_TOKEN/" "$ROOT"/.npmrc
+else
+  # Linux
+  sed -i "s/TOKEN/$NPM_TOKEN/" "$ROOT"/.npmrc
+fi
