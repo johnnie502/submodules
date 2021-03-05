@@ -12,7 +12,7 @@ docker run \
     ${LOCAL_USER_ID:-} \
     ${TTY} \
     -i \
-    -v $(pwd):/workdir:delegated \
+    -v $(pwd):/data:delegated \
     --rm \
     ${PHP_CS_FIXER_IMAGE} \
     fix "$@"
