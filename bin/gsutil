@@ -18,4 +18,4 @@ docker run \
     --mount source=user_config,target=/home/user/.config \
     --mount source=user_docker,target=/home/user/.docker \
     -w /workdir \
-    $GCLOUD_SDK_IMAGE gcloud "$@"
+    $GCLOUD_SDK_IMAGE gsutil "$@"
