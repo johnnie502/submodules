@@ -7,21 +7,30 @@ return PhpCsFixer\Config::create()
         '@Symfony'               => true,
         'binary_operator_spaces' => [
             'operators' => [
-            '=>' => 'align_single_space_minimal',
-        ], ],
+                '=>' => 'align_single_space_minimal',
+            ],
+        ],
+        'echo_tag_syntax'             => false,
         'ordered_class_elements'      => true,
         'ordered_imports'             => true,
         'yoda_style'                  => false,
         'blank_line_before_statement' => true,
         'class_attributes_separation' => [
-            'elements' => ['const', 'method', 'property'],
+            'elements' => [
+                'const',
+                'method',
+                'property'
+            ],
         ],
+        'no_alternative_syntax'  => false,
         'phpdoc_no_empty_return' => true,
-        'concat_space'           => ['spacing' => 'one'],
+        'concat_space'           => [
+            'spacing' => 'one'
+        ],
         'phpdoc_no_alias_tag'    => [
-                        'type' => 'var',
-                        'link' => 'see',
-                    ],
-	      'single_line_throw'      => false
+            'type' => 'var',
+            'link' => 'see',
+        ],
+        'single_line_throw'      => false
     ])
     ->setFinder($finder)->setUsingCache(false);
