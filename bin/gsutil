@@ -1,21 +1,5 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
-
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"
 
-. ${dir}/get_tty
-. ${dir}/get_local_user
-. ${dir}/get_images
-. "$ROOT"/docker/lib/volumes.sh
-
-docker run \
-    ${LOCAL_USER_ID:-} \
-    -i$TTY \
-    --rm \
-    --mount source=$PROJECT_VOLUME,target=/workdir \
-    --mount source=user_config,target=/home/user/.config \
-    --mount source=user_docker,target=/home/user/.docker \
-    -w /workdir \
-    $GCLOUD_SDK_IMAGE gsutil "$@"
+${dir}/google-cloud-sdk gsutil "$@"

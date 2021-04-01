@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$BASH_SOURCE[0]")/../.." && pwd)"
 
 echo "Change owner and group for gcloud config dir..."
-sudo chown -R circleci:circleci $HOME/.config/gcloud
+sudo chown -R circleci:circleci "$HOME/.config/gcloud"
 
 echo "Decode credentials..."
 echo "$GCLOUD_SERVICE_KEY" | base64 --decode -i > "./cloud-credentials.json"
@@ -20,7 +20,7 @@ echo "Configure account email..."
 gcloud config set account "$GCLOUD_SERVICE_EMAIL"
 
 echo "configure compute zone..."
-gcloud config set compute/zone us-central1-b
+gcloud config set compute/zone "$GCLOUD_SERVICE_ZONE"
 
 echo "Configure core/project..."
 gcloud config set core/project "$GCLOUD_PROJECT"
