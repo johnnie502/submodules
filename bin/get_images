@@ -10,7 +10,7 @@ export GOOGLE_PROJECT_ID=docker-1000101
 
 export PHP_CS_FIXER_ACCOUNT=cytopia
 export PHP_CS_FIXER_REPO=php-cs-fixer
-export PHP_CS_FIXER_TAG=latest
+export PHP_CS_FIXER_TAG=latest-php7.4-0.3
 export PHP_CS_FIXER_IMAGE=$DOCKER_REGISTRY_HOST/$PHP_CS_FIXER_ACCOUNT/$PHP_CS_FIXER_REPO:$PHP_CS_FIXER_TAG
 
 export GHERKIN_CS_FIXER_REPO=gherkin-cs-fixer
