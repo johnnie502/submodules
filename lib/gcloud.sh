@@ -47,6 +47,7 @@ stop_previous_versions() {
     # Fetch all previous serving versions sorted by creation time in desc. order.
     # Remove headings and start from second line.
     local ids=$(gcloud app versions list --service $1 \
+        --filter="version.servingStatus=serving" \
         --sort-by="~version.createTime" \
         --format="table[no-heading](version.id)" | tail -n +2)
     for version in $ids
