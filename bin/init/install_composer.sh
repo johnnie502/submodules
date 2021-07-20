@@ -45,7 +45,7 @@ isValidComposerSHA() {
   # The file includes sha256 string and file name with phar extension
   # The next method replaces the .phar from the string
   PARSED_SHA256_SUM="${SHA256_SUM/ composer.phar/}"
-  VALIDATION_RESULT=$(echo "$PARSED_SHA256_SUM ./bin/composer" | sha256sum -c) || TRUE
+  VALIDATION_RESULT=$(echo "$PARSED_SHA256_SUM ./bin/composer" | shasum -c -a 256) || TRUE
   if [ "$VALIDATION_RESULT" == "./bin/composer: OK" ]; then
     return
   fi
