@@ -1,48 +1,45 @@
 #!/usr/bin/env bash
 
-set -eu
-
-root=$(dirname "$0")
+set -euo pipefail
 
 #######################################
-# Set the git branch and tracker to that of the pull request
+# Resolves a relative path from a symlink to a fully qualified path
 #
 # Arguments:
-#   1 the url of the pull requests branch
-#   2 the ref of the pull requests branch
+#   1 the symlink to resolve (NOT the source, but the link)
+#   2 the relative path from the link source to resolve
 #######################################
-set_pull_request_branch () {
-    local git_url=$1
-    local git_ref=$2
+get_symlink_relative_path () {
+  local symlink="$1"
+  local relativePath="$2"
 
-    git remote add temp ${git_url}
-    git fetch temp
-    git checkout --track temp/${git_ref}
+  local symlinkPath
+  local symlinkDir
+  local sourceDir
+  local resolvedPath
+
+  # Find the source of the symlink
+  symlinkPath=$(readlink "$symlink")
+
+  # Get the symlink's directory
+  symlinkDir="$(cd "$(dirname "$symlink")" && pwd)"
+
+  # Change to the symlink's directory, then from there follow the symlink and get the source's directory
+  sourceDir="$(cd "$symlinkDir" && cd "$(dirname "$symlinkPath")" && pwd)"
+
+  # Resolve the relative path from the source's directory
+  resolvedPath="$(cd "$sourceDir/$relativePath" && pwd)"
+
+  echo "$resolvedPath"
 }
 
-#######################################
-# Retrieve the details of the pull request from the github api
-#
-# Globals:
-#   GITHUB_OAUTH
-#   GITHUB_READ_OAUTH
-#   GITHUB_TRIAGE_OAUTH
-#   CIRCLE_PROJECT_USERNAME
-#   CIRCLE_PROJECT_REPONAME
-#   CIRCLE_PR_NUMBER
-#######################################
-get_pr_details () {
-    if [[ ! -z  ${GITHUB_TRIAGE_OAUTH:=''} ]];
-      then local OAUTH=$GITHUB_TRIAGE_OAUTH
-    elif [[ ! -z  ${GITHUB_READ_OAUTH:=''} ]];
-      then local OAUTH=$GITHUB_READ_OAUTH
-    else
-      local OAUTH=$GITHUB_OAUTH
-    fi
+# The submodules dir is the parent of this script's dir, but since this script will be called via a symlink,
+# we can't get the parent of $0 directly. So instead, we get the parent of the symlink source (this script).
+submodules=$(get_symlink_relative_path "$0" '..')
 
-    echo $(curl -H "Authorization: token $OAUTH" -H "Accept: application/vnd.github.shadow-cat-preview+json" \
-    -S https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${CIRCLE_PR_NUMBER})
-}
+# Include lib functions
+. "$submodules"/lib/git.sh
+. "$submodules"/lib/github.sh
 
 #######################################
 # Fix and stage files
@@ -51,42 +48,25 @@ get_pr_details () {
 #   1 the files to fix / stage
 #######################################
 fix_and_stage_styles () {
-    local files=$1
+    local files="$1"
 
-    "$root"/style-fixer $files
+    "$submodules"/bin/style-fixer "$files"
     echo "$files" | xargs git add
 }
 
 #######################################
-# Checks if any files have been fixed
-# exits if not
-#######################################
-exit_if_no_changes () {
-    if [[ $(git status | grep -Ec 'Changes to be committed') -eq 0 ]]; then
-      echo "No style issues found moving on..."
-      exit 0
-    fi
-}
-
-#######################################
-# Applies file changes and exits
+# Commits & pushes staged changes and exits with a non-zero exit code.
+#
+# Arguments:
+#   1 the type of changes that are being applied
 #######################################
 apply_changes_and_exit () {
-    echo "Found style issues. pushing back to branch..."
-    git commit -m"Apply code style fixes"
+    local type="$1"
+
+    echo "Found $type changes. Pushing back to branch..."
+    git commit -m "Apply $type changes"
     git push
     exit 1
-}
-
-#######################################
-# Exits if branch is on master
-#######################################
-exit_if_on_master () {
-    local branch="$(git symbolic-ref --short HEAD)"
-    if [[ "$branch" == "master" ]]; then
-        echo "Skipping style fixer since the branch is $branch"
-        exit 0
-    fi
 }
 
 #######################################
@@ -104,22 +84,20 @@ get_fixable_files () {
     echo "$fixable_files"
 }
 
-exit_if_on_master
+git.branch.exit-if-master "Skipping style fixer"
 
 fixable_files=$(get_fixable_files)
 
-if [[ ! -z "$fixable_files" ]];then
+if [[ -n "$fixable_files" ]];then
     fix_and_stage_styles "$fixable_files"
 fi
 
-exit_if_no_changes
+git.index.exit_if_empty "No style changes found. Moving on..."
 
-api_response=$(get_pr_details)
+api_response=$(github.pull.get)
+git_url=$(github.pull.url.get "$api_response")
+git_ref=$(github.pull.ref.get "$api_response")
 
-git_url=$(echo ${api_response} | jq '.head.repo.git_url' | sed -e 's/^"//' -e 's/"$//')
+git.branch.checkout-and-track "$git_url" "$git_ref"
 
-git_ref=$(echo ${api_response} | jq '.head.ref' | sed -e 's/^"//' -e 's/"$//')
-
-set_pull_request_branch "$git_url" "$git_ref"
-
-apply_changes_and_exit
+apply_changes_and_exit style
