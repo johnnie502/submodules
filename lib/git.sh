@@ -50,3 +50,35 @@ git.index.exit_if_empty () {
       exit 0
     fi
 }
+
+#######################################
+# Indexes staged git files based on filters passed
+#
+# Flags:
+#   -g=|--git-filters= string of git short formats to filter by defaults to "MARC"
+#   https://git-scm.com/docs/git-status#_short_format
+#
+#   -e=|--extension-filters= string of extensions to filter by E.g. "*.php" or "*.php|*.js"
+#######################################
+git.index.staged () {
+  local gitFilters='MARC'
+  local extensionFilters=''
+
+  for i in "$@"; do
+    case $i in
+      -g=*|--git-filters=*)
+        gitFilters="${i#*=}"
+        shift
+        ;;
+      -e=*|--extension-filters=*)
+        extensionFilters="-- ${i#*=}"
+        shift
+        ;;
+      *)
+        # unknown option
+        ;;
+    esac
+  done
+
+  echo $(git status --short $extensionFilters | { grep "^[$gitFilters]" || true; } | cut -c 4-)
+}
