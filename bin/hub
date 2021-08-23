@@ -15,4 +15,5 @@ docker run \
     -v $(pwd):/workdir:delegated \
     -v ~/.gitconfig:/home/user/.gitconfig:delegated \
     -v ~/.ssh:/home/user/.ssh:delegated \
+    -v ~/.config/hub:/home/user/.config/hub:delegated \
     gcr.io/docker-1000101/hub:2.14.2-a1ab6f08a699bc1c22b131536e4c05db65c53eff "$@"

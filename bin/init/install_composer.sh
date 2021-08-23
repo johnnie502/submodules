@@ -41,12 +41,12 @@ clearComposerSHA() {
 #
 #############################################
 isValidComposerSHA() {
-  SHA256_SUM=$(cat ./bin/composer.sha256sum)
+  SHA256_SUM=$(cat "$ROOT"/bin/composer.sha256sum)
   # The file includes sha256 string and file name with phar extension
   # The next method replaces the .phar from the string
   PARSED_SHA256_SUM="${SHA256_SUM/ composer.phar/}"
-  VALIDATION_RESULT=$(echo "$PARSED_SHA256_SUM ./bin/composer" | shasum -c -a 256) || TRUE
-  if [ "$VALIDATION_RESULT" == "./bin/composer: OK" ]; then
+  VALIDATION_RESULT=$(echo "$PARSED_SHA256_SUM "$ROOT"/bin/composer" | shasum -c -a 256) || TRUE
+  if [ "$VALIDATION_RESULT" == "$ROOT/bin/composer: OK" ]; then
     return
   fi
 
@@ -67,7 +67,7 @@ checkExistingInstallation() {
     echo "Checking Composer version..."
     FOUND_VERSION=$( \
         cd "$ROOT" && \
-        ./bin/composer --version | \
+        "$ROOT"/bin/composer --version | \
         tail -1 | \
         awk '{print $3}' \
     )
