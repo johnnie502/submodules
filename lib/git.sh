@@ -52,7 +52,7 @@ git.index.exit_if_empty () {
 }
 
 #######################################
-# Indexes staged git files based on filters passed
+# Lists staged files based on filters passed
 #
 # Flags:
 #   -g=|--git-filters= string of git short formats to filter by defaults to "MARC"
