@@ -59,10 +59,13 @@ git.index.exit_if_empty () {
 #   https://git-scm.com/docs/git-status#_short_format
 #
 #   -e=|--extension-filters= string of extensions to filter by E.g. "*.php" or "*.php|*.js"
+#
+#   -* all other flags will be passed into git status
 #######################################
 git.index.staged () {
   local gitFilters='MARC'
   local extensionFilters=''
+  local gitFlags=''
 
   for i in "$@"; do
     case $i in
@@ -74,11 +77,15 @@ git.index.staged () {
         extensionFilters="-- ${i#*=}"
         shift
         ;;
+      -*)
+        gitFlags="$gitFlags $i"
+        shift
+        ;;
       *)
         # unknown option
         ;;
     esac
   done
 
-  echo $(git status --short $extensionFilters | { grep "^[$gitFilters]" || true; } | cut -c 4-)
+  echo $(git status --short $gitFlags $extensionFilters | { grep "^[$gitFilters]" || true; } | cut -c 4-)
 }
