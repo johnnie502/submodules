@@ -31,6 +31,7 @@ return PhpCsFixer\Config::create()
             'type' => 'var',
             'link' => 'see',
         ],
-        'single_line_throw'      => false
+        'single_line_throw'      => false,
+        'no_unneeded_curly_braces' => false,
     ])
     ->setFinder($finder)->setUsingCache(false);
