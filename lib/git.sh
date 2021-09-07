@@ -78,7 +78,11 @@ git.index.staged () {
         shift
         ;;
       -*)
-        gitFlags="$gitFlags $i"
+        if [ -z "$gitFlags" ]; then
+          gitFlags="$i"
+        else
+          gitFlags="$gitFlags $i"
+        fi
         shift
         ;;
       *)
@@ -87,5 +91,5 @@ git.index.staged () {
     esac
   done
 
-  echo $(git status --short $gitFlags $extensionFilters | { grep "^[$gitFilters]" || true; } | cut -c 4-)
+  git status --short ${gitFlags:-} ${extensionFilters:-} | { grep "^[$gitFilters]" || true; } | cut -c 4-
 }
