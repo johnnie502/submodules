@@ -12,7 +12,7 @@ docker run \
     ${LOCAL_USER_ID:-} \
     $TTY \
     -i \
-    -v "$(pwd)":/data:delegated \
+    -v "$(pwd)":/workdir:delegated \
     --rm \
     us.gcr.io/docker-1000101/php-cs-fixer:latest \
-    fix "$@"
+    "$@"
