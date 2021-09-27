@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
-set -eu
+set -euo pipefail
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-. ${dir}/get_tty
-. ${dir}/get_local_user
-. ${dir}/get_images
+. "$dir/get_tty"
+. "$dir/get_local_user"
+. "$dir/get_images"
 
 docker run \
     ${LOCAL_USER_ID:-} \
-    ${TTY} \
+    $TTY \
     -i \
-    -v $(pwd):/data:delegated \
+    -v "$(pwd)":/data:delegated \
     --rm \
-    ${PHP_CS_FIXER_IMAGE} \
+    us.gcr.io/docker-1000101/php-cs-fixer:latest \
     fix "$@"

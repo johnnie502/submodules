@@ -68,7 +68,7 @@ fi
 if [[ "$php_files" != "" ]]; then
   echo -e "$GREEN Fixing PHP files code style...$NC"
   echo $php_files
-  "$dir"/php-cs-fixer ${php_files##*( )} --config=.php_cs.dist --allow-risky=yes
+  "$dir"/php-cs-fixer ${php_files##*( )} --allow-risky=yes
 fi
 
 # Java files
