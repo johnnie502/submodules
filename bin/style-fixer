@@ -2,7 +2,7 @@
 
 set -eu
 
-if [[ -z $@ ]]; then
+if [ "$#" == 0 ]; then
   echo "No files provided"
   exit 1
 fi
@@ -54,27 +54,44 @@ done
 # Frontend files
 if [[ "$front_end_files" != "" ]]; then
   echo -e "$GREEN Fixing Frontend files code style...$NC"
-  "$dir"/prettier-eslint ${front_end_files##*( )} --write --single-quote --print-width=120
+
+  # Suppress "Double quote to prevent globbing and word splitting.", because we intend word-splitting here.
+  # shellcheck disable=SC2086
+  "$dir/prettier-eslint" ${front_end_files##*( )} --write --single-quote --print-width=120
 fi
 
 # Gherkin files
 if [[ "$gherkin_files" != "" ]]; then
   echo -e "$GREEN Fixing Gherkin files code style...$NC"
-  echo $gherkin_files
+  echo "$gherkin_files"
+
+  # Suppress "Double quote to prevent globbing and word splitting.", because we intend word-splitting here.
+  # shellcheck disable=SC2086
   "$dir"/gherkin-cs-fixer ${gherkin_files##*( )}
 fi
 
 # PHP files
 if [[ "$php_files" != "" ]]; then
   echo -e "$GREEN Fixing PHP files code style...$NC"
-  echo $php_files
-  "$dir"/php-cs-fixer ${php_files##*( )} --allow-risky=yes
+  echo "$php_files"
+
+  if ! which custom-php-cs-fixer; then
+    echo "The host project is missing the Medology/custom-php-cs-fixer Composer package. Please add it to dev requirements"
+    exit 1
+  fi
+
+  # Suppress "Double quote to prevent globbing and word splitting.", because we intend word-splitting here.
+  # shellcheck disable=SC2086
+  custom-php-cs-fixer ${php_files##*( )} --allow-risky=yes
 fi
 
 # Java files
 if [[ "$java_files" != "" ]]; then
   echo -e "$GREEN Fixing Java files code style...$NC"
-  echo $java_files
+  echo "$java_files"
+
+  # Suppress "Double quote to prevent globbing and word splitting.", because we intend word-splitting here.
+  # shellcheck disable=SC2086
   "$dir"/java-cs-fixer --replace --aosp ${java_files##*( )}
 fi
 
